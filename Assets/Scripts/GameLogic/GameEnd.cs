@@ -11,6 +11,16 @@ public class GameEnd : MonoBehaviour
         Time.timeScale = 1;
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.GetComponent<EnterDeadZone>())
+        {
+            Time.timeScale = 0;
+
+            _gameEndPanel.SetActive(true);
+        }
+    }
+
     private void OnTriggerStay(Collider other)
     {
         if (other.gameObject.GetComponent<BaseEnemy>())

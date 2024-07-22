@@ -6,13 +6,30 @@ public class CameraMove : MonoBehaviour
 {
     [SerializeField] private Transform _playerTransform;
 
-    private Vector3 _offset = new Vector3(0, 2, 0);
+    private Vector2 mapMinBounds = new(-20, -15); // Минимальные координаты карты (левый нижний угол)
+    private Vector2 mapMaxBounds = new(20, 15);
+    private int _cameraZOffset = 2;
+    private float _cameraHalfHeight;
+    private float _cameraHalfWidth;
+
+    void Start()
+    {
+        Camera camera = Camera.main;
+        _cameraHalfHeight = camera.orthographicSize;
+        _cameraHalfWidth = _cameraHalfHeight * camera.aspect;
+    }
 
     private void LateUpdate()
     {
-        if (_playerTransform != null)
-        {
-            transform.position = _playerTransform.position + _offset;
-        }
+        Vector3 targetPosition = _playerTransform.position;
+
+        // Ограничение позиции камеры
+        float clampedX = Mathf.Clamp(targetPosition.x, mapMinBounds.x + _cameraHalfWidth, mapMaxBounds.x - _cameraHalfWidth);
+        float clampedY = Mathf.Clamp(targetPosition.z, mapMinBounds.y + _cameraHalfHeight, mapMaxBounds.y - _cameraHalfHeight);
+
+        // Позиция камеры с учётом ограничений
+        Vector3 cameraPosition = new Vector3(clampedX, targetPosition.y, clampedY) + new Vector3(0, _cameraZOffset, 0);
+
+        transform.position = cameraPosition;
     }
 }

@@ -29,33 +29,61 @@ public class EnemySpawner : MonoBehaviour
         {
             yield return new WaitForSeconds(_spawnInterval);
 
-            Vector3 cameraPos = _mainCamera.transform.position;
-
-            float cameraHeight = 2f * _mainCamera.orthographicSize;
-            float cameraWidth = cameraHeight * _mainCamera.aspect;
+            Camera mainCamera = Camera.main;
+            Vector3 bottomLeft = mainCamera.ViewportToWorldPoint(new Vector3(0, 0, mainCamera.nearClipPlane));
+            Vector3 topRight = mainCamera.ViewportToWorldPoint(new Vector3(1, 1, mainCamera.nearClipPlane));
 
             float minX = -_fieldSize.x / 2;
             float maxX = _fieldSize.x / 2;
             float minZ = -_fieldSize.y / 2;
             float maxZ = _fieldSize.y / 2;
 
-            float spawnX, spawnZ;
+            float cameraMinX = bottomLeft.x;
+            float cameraMaxX = topRight.x;
+            float cameraMinZ = bottomLeft.z;
+            float cameraMaxZ = topRight.z;
 
-            if (Random.value < 0.5f)
+            // Расстояние до границы мира от края камеры
+            float minDistance = 3.0f;
+
+            // Проверка доступных сторон
+            bool canSpawnLeft = (cameraMinX - minX) > minDistance;
+            bool canSpawnRight = (maxX - cameraMaxX) > minDistance;
+            bool canSpawnTop = (maxZ - cameraMaxZ) > minDistance;
+            bool canSpawnBottom = (cameraMinZ - minZ) > minDistance;
+
+            // Выбор стороны для спавна
+            Vector3 spawnPosition = Vector3.zero;
+            if (canSpawnLeft && (canSpawnRight || canSpawnTop || canSpawnBottom))
             {
-                spawnX = (Random.value < 0.5f) ? cameraPos.x - cameraWidth / 2 - _spawnDistanceFromCamera : cameraPos.x + cameraWidth / 2 + _spawnDistanceFromCamera;
-                spawnZ = Random.Range(cameraPos.z - cameraHeight / 2, cameraPos.z + cameraHeight / 2);
+                // Выбираем случайную сторону для спавна
+                bool spawnLeftOrRight = Random.value < 0.5f;
+
+                if (spawnLeftOrRight)
+                {
+                    // Спавн по горизонтали
+                    spawnPosition.x = Random.Range(cameraMinX - minDistance, cameraMinX - minDistance);
+                    spawnPosition.z = Random.Range(minZ, maxZ);
+                }
+                else
+                {
+                    // Спавн по вертикали
+                    spawnPosition.x = Random.Range(minX, maxX);
+                    spawnPosition.z = Random.Range(cameraMaxZ + minDistance, cameraMaxZ + minDistance);
+                }
             }
-            else
+            else if (canSpawnTop && canSpawnBottom)
             {
-                spawnX = Random.Range(cameraPos.x - cameraWidth / 2, cameraPos.x + cameraWidth / 2);
-                spawnZ = (Random.value < 0.5f) ? cameraPos.z - cameraHeight / 2 - _spawnDistanceFromCamera : cameraPos.z + cameraHeight / 2 + _spawnDistanceFromCamera;
+                // Спавн по вертикали
+                spawnPosition.x = Random.Range(cameraMinX, cameraMaxX);
+                spawnPosition.z = Random.Range(cameraMaxZ + minDistance, cameraMaxZ + minDistance);
             }
-
-            spawnX = Mathf.Clamp(spawnX, minX, maxX);
-            spawnZ = Mathf.Clamp(spawnZ, minZ, maxZ);
-
-            Vector3 spawnPosition = new(spawnX, 0, spawnZ);
+            else if (canSpawnBottom && canSpawnTop)
+            {
+                // Спавн по горизонтали
+                spawnPosition.x = Random.Range(cameraMinX - minDistance, cameraMinX - minDistance);
+                spawnPosition.z = Random.Range(minZ, maxZ);
+            }
 
             float randomValue = Random.Range(0, maxInclusive: 1);
 
