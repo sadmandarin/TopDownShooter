@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MouseClick : MonoBehaviour
@@ -23,10 +21,15 @@ public class MouseClick : MonoBehaviour
 
             targetPosition.y = 0.5f;
 
+            _playerShoot.SetTargetForGrenade(targetPosition);
+
             _playersRotate.Rotate(targetPosition);
         }            
 
         else if (Input.GetMouseButtonUp(0))
+        {
             _playerShoot.IsShooting = false;
+        }
+            
     }
 }

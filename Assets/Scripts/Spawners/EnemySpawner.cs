@@ -1,24 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
     [SerializeField] private List<GameObject> _enemyPrefab;
 
-
-    private Camera _mainCamera;
     private Vector2 _fieldSize = new Vector2(40, 30);
-
-    private float _spawnDistanceFromCamera = 1.0f;
     private float _spawnInterval = 2f;
     private float _reduceTime = 10f;
 
     void Start()
     {
-        _mainCamera = Camera.main;
-
         StartCoroutine(SpawnEnemy());
         StartCoroutine(ReduceSpawnInterval());
     }
@@ -43,44 +36,36 @@ public class EnemySpawner : MonoBehaviour
             float cameraMinZ = bottomLeft.z;
             float cameraMaxZ = topRight.z;
 
-            // Расстояние до границы мира от края камеры
             float minDistance = 3.0f;
 
-            // Проверка доступных сторон
             bool canSpawnLeft = (cameraMinX - minX) > minDistance;
             bool canSpawnRight = (maxX - cameraMaxX) > minDistance;
             bool canSpawnTop = (maxZ - cameraMaxZ) > minDistance;
             bool canSpawnBottom = (cameraMinZ - minZ) > minDistance;
 
-            // Выбор стороны для спавна
             Vector3 spawnPosition = Vector3.zero;
             if (canSpawnLeft && (canSpawnRight || canSpawnTop || canSpawnBottom))
             {
-                // Выбираем случайную сторону для спавна
                 bool spawnLeftOrRight = Random.value < 0.5f;
 
                 if (spawnLeftOrRight)
                 {
-                    // Спавн по горизонтали
                     spawnPosition.x = Random.Range(cameraMinX - minDistance, cameraMinX - minDistance);
                     spawnPosition.z = Random.Range(minZ, maxZ);
                 }
                 else
                 {
-                    // Спавн по вертикали
                     spawnPosition.x = Random.Range(minX, maxX);
                     spawnPosition.z = Random.Range(cameraMaxZ + minDistance, cameraMaxZ + minDistance);
                 }
             }
             else if (canSpawnTop && canSpawnBottom)
             {
-                // Спавн по вертикали
                 spawnPosition.x = Random.Range(cameraMinX, cameraMaxX);
                 spawnPosition.z = Random.Range(cameraMaxZ + minDistance, cameraMaxZ + minDistance);
             }
             else if (canSpawnBottom && canSpawnTop)
             {
-                // Спавн по горизонтали
                 spawnPosition.x = Random.Range(cameraMinX - minDistance, cameraMinX - minDistance);
                 spawnPosition.z = Random.Range(minZ, maxZ);
             }

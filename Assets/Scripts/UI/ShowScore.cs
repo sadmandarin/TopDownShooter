@@ -18,6 +18,7 @@ public class ShowScore : MonoBehaviour
         {
             _newRecord.SetActive(true);
             _container.SetHighScore(_score.Scores);
+            SaveManager.SaveMaxScore(_score.Scores);
         }
 
     }

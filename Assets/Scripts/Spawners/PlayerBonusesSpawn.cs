@@ -6,13 +6,13 @@ public class PlayerBoostSpawn : MonoBehaviour
 {
     [SerializeField] private List<GameObject> _guns;
     [SerializeField] private List<GameObject> _bonuses;
+    [SerializeField] private PlayerShoot _currentGun;
 
     private Coroutine _bonusSpawn;
     private Coroutine _gunSpawn;
     private int _bonusSpawnTimer = 27;
     private int _gunSpawnTimer = 10;
     private Vector2 _fieldSize = new Vector2(40, 30);
-    private Camera _mainCamera;
 
     private void Start()
     {
@@ -41,13 +41,18 @@ public class PlayerBoostSpawn : MonoBehaviour
 
             Vector3 spawnPos = new(spawnX, 0.5f, spawnZ);
 
-            float random = Random.Range(0, maxInclusive: 1);
-
-            if (random <= 0.5)
-                Instantiate(_bonuses[0], spawnPos, Quaternion.identity);
-            else
-                Instantiate(_bonuses[1], spawnPos, Quaternion.identity);
+            SpawnBonus(spawnPos);
         }
+    }
+
+    void SpawnBonus(Vector3 spawnPos)
+    {
+        float random = Random.Range(0, maxInclusive: 1);
+
+        if (random <= 0.5)
+            Instantiate(_bonuses[0], spawnPos, Quaternion.identity);
+        else
+            Instantiate(_bonuses[1], spawnPos, Quaternion.identity);
     }
 
     private IEnumerator GunSpawn()
@@ -71,16 +76,18 @@ public class PlayerBoostSpawn : MonoBehaviour
 
             Vector3 spawnPos = new(spawnX, 0.5f, spawnZ);
 
-            float random = Random.Range(0, maxInclusive: 1);
-
-            if (random < 0.25)
-                Instantiate(_guns[0], spawnPos, Quaternion.identity);
-            else if(random >= 0.75)
-                Instantiate(_guns[1], spawnPos, Quaternion.identity);
-            else if (random >= 0.5 && random < 0.75)
-                Instantiate(_guns[2], spawnPos, Quaternion.identity);
-            else if(random >= 0.25 && random < 0.5)
-                Instantiate(_guns[3], spawnPos, Quaternion.identity);
+            SpawnGun(spawnPos);
         }
+    }
+
+    void SpawnGun(Vector3 spawnPos)
+    {
+        List<GameObject> avaiableGun = new List<GameObject>(_guns);
+        if (_currentGun.GunType)
+        {
+            avaiableGun.Remove(_currentGun.GunType.gameObject);
+        }
+        
+        Instantiate(avaiableGun[Random.Range(0, avaiableGun.Count)], spawnPos, Quaternion.identity);
     }
 }

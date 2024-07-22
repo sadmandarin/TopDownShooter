@@ -1,7 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class ZoneSpawner : MonoBehaviour
 {
@@ -63,9 +61,6 @@ public class ZoneSpawner : MonoBehaviour
         {
             float x = Random.Range(minX, maxX);
             float y = Random.Range(minY, maxY);
-
-            //float x = Random.Range(_minDistance + zoneRadius, _mapSize.x - _minDistance - zoneRadius);
-            //float y = Random.Range(_minDistance + zoneRadius, _mapSize.y - _minDistance - zoneRadius);
 
             Vector2 randomPosition = new(x, y);
 

@@ -1,18 +1,25 @@
-using System.Collections;
-using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
-public class SaveManager : MonoBehaviour
+public class SaveManager
 {
-    // Start is called before the first frame update
-    void Start()
+    private static string filePath = Path.Combine(Application.persistentDataPath, "maxScore.json");
+
+    public static void SaveMaxScore(int maxScore)
     {
-        
+        string json = JsonUtility.ToJson(new Data(maxScore));
+        File.WriteAllText(filePath, json);
     }
 
-    // Update is called once per frame
-    void Update()
+    public static int LoadMaxScore()
     {
-        
+        if (File.Exists(filePath))
+        {
+            string json = File.ReadAllText(filePath);
+            Data scoreData = JsonUtility.FromJson<Data>(json);
+            return scoreData.Score;
+        }
+        return 0;
     }
+
 }

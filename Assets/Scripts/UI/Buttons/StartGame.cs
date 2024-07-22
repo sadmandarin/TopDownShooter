@@ -6,7 +6,4 @@ public class StartGame : BaseButton
     {
         SceneManager.LoadScene(1);
     }
-
-    
-    
 }
